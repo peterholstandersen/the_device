@@ -1,0 +1,14 @@
+Setup web logging
+
+OTA
+
+PID relay
+
+Read target temp from web server
+
+Change blink to other pattern
+
+Real PID
+- Use interrupt
+- What about WiFi taking time?
+
