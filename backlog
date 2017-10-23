@@ -1,10 +1,19 @@
-Log various useful information from relay.h
+Clean up + commit
 
-Fix use of "multiple libraries" ESP8266http... (see compile output)
+Power 220V on
+
+Extern 5V ok?
 
 Relay wiring (note inside box)
 - measure diode/relay (should give VCC and GND)
 - Test
+
+60W
+
+Vandkoger
+
+Log various useful information from relay.h
+
 
 Test with simple relay algorithm
 

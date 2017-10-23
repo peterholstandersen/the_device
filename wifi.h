@@ -63,14 +63,13 @@ bool connect_wifi(bool force) {
     return true;
 
   // Not connected: check if it is time try again
-  long now = millis();
-  if (!force && next_wifi_retry != 0 && now < next_wifi_retry) {
+  if (!force && millis() < next_wifi_retry) {
     log_message_serial_only("Not time to reconnect yet\n");
     return false;
   }
 
   bool led_on = true;
-  long timeout = now + 20000;
+  long timeout = millis() + 20000;
   while (WiFi.status() != WL_CONNECTED && millis() < timeout) {
     led_on = !led_on;
     digitalWrite(YELLOW_PIN, led_on ?HIGH :LOW);

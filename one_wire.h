@@ -74,8 +74,6 @@ void loop_one_wire() {
   // called more often than every 750ms
 
   sensors.requestTemperatures();
-
-  return;
 }
 
 
