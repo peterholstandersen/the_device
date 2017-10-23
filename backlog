@@ -1,14 +1,33 @@
-Setup web logging
+Log various useful information from relay.h
 
-OTA
+Fix use of "multiple libraries" ESP8266http... (see compile output)
+
+Relay wiring (note inside box)
+- measure diode/relay (should give VCC and GND)
+- Test
+
+Test with simple relay algorithm
+
+
+----------------
+
+Ensure temperature and log in /var/www/log does not grow too much
+
+Control commands via http
 
 PID relay
 
-Read target temp from web server
-
-Change blink to other pattern
+Read target temperature from web server
+Log target temperature
 
 Real PID
 - Use interrupt
 - What about WiFi taking time?
 
+
+
+================================================================
+HARDWARE
+================================================================
+
+1-wire plug: find wrapper

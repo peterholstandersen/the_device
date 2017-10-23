@@ -5,7 +5,7 @@ static const long red_off = 500;
 
 void set_error(Error cause)
 {
-  Serial.print("Error: " + String(cause) + "\n");
+  log_message("Error: " + String(cause) + "\n");
   
   int green = LOW;
   int yellow = LOW;

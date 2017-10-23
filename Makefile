@@ -2,6 +2,7 @@ ARDUINO_HOME = /home/peter/arduino-1.8.1
 ESPTOOL      = $(ARDUINO_HOME)/hardware/esp8266com/esp8266/tools/esptool/esptool
 SKETCH       = $(notdir $(CURDIR)).ino
 TARGET_DIR   = $(CURDIR)/build
+INSTALL_DIR  = /var/www/html/esp/
 MONITOR_PORT = /dev/ttyUSB0
 VERBOSE      = -verbose
 
@@ -20,10 +21,13 @@ all:
 	-prefs=build.warn_data_percentage=75 \
 	$(VERBOSE) "$(SKETCH)"
 
-flash:
+flash: install
 	$(ESPTOOL) -v -cd nodemcu -cb 115200 -cp $(MONITOR_PORT) -ca 0x00000 -cf $(TARGET_DIR)/$(SKETCH).bin
 
 upload: all flash
+
+install: all
+	sudo cp ./build/$(SKETCH).bin $(INSTALL_DIR)
 
 clean:
 	rm -rf $(TARGET_DIR)

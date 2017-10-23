@@ -1,26 +1,62 @@
+void setup_wifi();
+void update_wifi_led();
+bool connect_wifi(bool force);
+void check_update();
+void log_temperature();
+
+static long wifi_next;
+
+static long next_wifi_retry = 0;
+
+// ================================================================================
+// setup_wifi
+// ================================================================================
 void setup_wifi()
 {
   if (error != NO_ERROR)
     return;
   
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+  log_message_serial_only("Connecting to " SSID "\n");
   
-  /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
-     would try to act as both a client and an access-point and could cause
-     network-issues with your other WiFi-devices on your WiFi-network. */
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID, password);
 
-  // TODO: connect_wifi(true);
-  // TODO: check update
+  connect_wifi(true);
 }
 
-long wifi_retry = 0;
+// ================================================================================
+// loop_wifi
+// ================================================================================
+void loop_wifi() {
+  if (error != NO_ERROR)
+    return;
 
+  update_wifi_led();
+  
+  long now = millis();
+  if (now < wifi_next)
+    return;
+  wifi_next = now + WIFI_INTERVAL;
+
+  if (!connect_wifi(false))
+    return;
+
+  log_temperature();
+  check_update();
+}
+
+
+// ================================================================================
+// update_wifi_led
+// ================================================================================
+void update_wifi_led() {
+  digitalWrite(YELLOW_PIN, (WiFi.status() == WL_CONNECTED) ? HIGH : LOW);
+}
+
+// ================================================================================
+// connect_wifi
 // Connect to WiFi if not already connected
+// ================================================================================
 bool connect_wifi(bool force) {
 
   if (WiFi.status() == WL_CONNECTED)
@@ -28,8 +64,8 @@ bool connect_wifi(bool force) {
 
   // Not connected: check if it is time try again
   long now = millis();
-  if (!force && wifi_retry != 0 && now < wifi_retry) {
-    Serial.println("Not time to reconnect yet");
+  if (!force && next_wifi_retry != 0 && now < next_wifi_retry) {
+    log_message_serial_only("Not time to reconnect yet\n");
     return false;
   }
 
@@ -39,84 +75,93 @@ bool connect_wifi(bool force) {
     led_on = !led_on;
     digitalWrite(YELLOW_PIN, led_on ?HIGH :LOW);
     delay(500);
-    Serial.print(".");
+    log_message_serial_only(".");
   }
-  Serial.println("");
+  log_message_serial_only("\n");
 
+  update_wifi_led();
+  
   if (WiFi.status() == WL_CONNECTED) {
-    digitalWrite(YELLOW_PIN, HIGH);
-    Serial.println("WiFi connected");  
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+    log_message("WiFi connected.\n");
     return true;
   }
   else {
-    Serial.println("Unable to connect to WiFi");
-    digitalWrite(YELLOW_PIN, LOW);
-    wifi_retry = millis() + WIFI_RETRY_DELAY;
+    log_message_serial_only("Unable to connect to WiFi\n");
+    next_wifi_retry = millis() + WIFI_RETRY_DELAY;
     return false;
   }
 }
 
-void shutdown_wifi() {
-  WiFi.persistent(false);
-  WiFi.disconnect();  
+// ================================================================================
+// check_update
+// ================================================================================
+void check_update()
+{
+  log_message("Check update\n");
+
+  t_httpUpdate_return ret = ESPhttpUpdate.update(HOST, PORT, UPDATE_URL, VERSION);
+
+  switch(ret) {
+  case HTTP_UPDATE_FAILED:
+    log_message("Update failed\n");
+    break;
+  case HTTP_UPDATE_NO_UPDATES:
+    log_message("No update available\n");
+    break;
+  case HTTP_UPDATE_OK:
+    // Never reaches this point as the device reboots before
+    break;
+  }
 }
 
-static const long wifi_interval = WIFI_UPLOAD_INTERVAL;
-static long wifi_next;
+bool do_request(String url)
+{
+  log_message_serial_only("Connecting to " HOST "\n");
 
-void loop_wifi() {
-  if (error != NO_ERROR)
-    return;
-  
-  long now = millis();
-  if (now < wifi_next)
-    return;
-
-  Serial.println("loop_wifi");
-  
-  wifi_next = now + wifi_interval;
-
-  if (!connect_wifi(false))
-    return;
-  
-  Serial.print("connecting to ");
-  Serial.println(host);
-
-  // Use WiFiClient class to create TCP connections
   WiFiClient client;
-  const int httpPort = 80;
-  if (!client.connect(host, httpPort)) {
-    Serial.println("connection failed");
-    return;
+
+  if (!client.connect(HOST, PORT)) {
+    log_message_serial_only("Connection failed");
+    return false;
+  }
+  
+  log_message_serial_only("Requesting URL: " + String(url) + "\n");
+  
+  client.print(String("GET ") + url + " HTTP/1.1\r\n"
+	       "Host: " HOST "\r\n"
+	       "Connection: close\r\n\r\n");
+
+  unsigned long timeout = millis();
+  while (client.available() == 0) {
+    if (millis() - timeout > 5000) {
+      log_message_serial_only("HTTP request timeout\n");
+      // TODO: cleanup
+      client.stop();
+      return false;
+    }
   }
 
+  log_message_serial_only("Closing connection\n");
+  client.stop();
+
+  return true;
+}
+
+
+// ================================================================================
+// log_temperature
+// ================================================================================
+void log_temperature()
+{
   for (int i = 0; i < deviceCount; i++) {
     digitalWrite(YELLOW_PIN, LOW);
     delay(250);
     digitalWrite(YELLOW_PIN, HIGH);
     
-    String url = url_template + "?id=" + deviceId[i] + "&temperature=" + String(temperatures[i], 1);
-
-    Serial.print("Requesting URL: ");
-    Serial.println(url);
-  
-    // This will send the request to the server
-    client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-		 "Host: " + host + "\r\n" + 
-		 "Connection: close\r\n\r\n");
-    unsigned long timeout = millis();
-    while (client.available() == 0) {
-      if (millis() - timeout > 5000) {
-         Serial.println(">>> Client Timeout !");
-	 client.stop();
-	 return;
-      }
-    }
+    String url = log_temperature_url + "?id=" + deviceId[i] + "&temperature=" + String(temperatures[i], 1);
+    
+    if (!do_request(url))
+      return;
   }
-  
-  Serial.println("closing connection");
-  client.stop();
 }
 

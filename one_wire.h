@@ -15,8 +15,8 @@ void setup_one_wire() {
   sensors.begin();
   deviceCount = sensors.getDeviceCount();
 
-  Serial.println("Found " + String(deviceCount) + " devices");
-
+  log_message("Found " + String(deviceCount) + " one-wire device(s)\n");
+  
   if (deviceCount != 1) {
     set_error(ONE_WIRE_ERROR);
     return;
@@ -34,6 +34,8 @@ void setup_one_wire() {
       deviceId[i] = deviceId[i] + String(deviceAddress[i][j]);
     
     sensors.setResolution(deviceAddress[i], TEMPERATURE_PRECISION);
+
+    log_message("deviceId[" + String(i) + "] = " + String(deviceId[i]) + "\n");
   }
   
   sensors.setWaitForConversion(false);
@@ -56,14 +58,14 @@ void loop_one_wire() {
   for (uint8_t i = 0; i < deviceCount; i++) {
     float reading = sensors.getTempC(deviceAddress[i]);
 
-    Serial.println(String(temperatures[i], 1));
+    // log_message(String(temperatures[i], 1) + "  (target " + String(TARGET_TEMPERATURE, 1) + ")\n");
 
     // Only keep most sensible readings
     if (-20.0 <= reading && reading <= 110.0) {
       temperatures[i] = reading;
     }
     else {
-      Serial.println("Reading disregarded as an error");
+      log_message("Reading disregarded as an error");
     }
   }
   
