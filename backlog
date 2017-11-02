@@ -1,22 +1,16 @@
-Clean up + commit
-
-Power 220V on
-
-Extern 5V ok?
-
-Relay wiring (note inside box)
-- measure diode/relay (should give VCC and GND)
-- Test
-
-60W
-
 Vandkoger
 
 Log various useful information from relay.h
 
-
 Test with simple relay algorithm
 
+Relay PID
+
+Real PID
+- Use interrupt
+- What about WiFi taking time?
+
+Stram heatsink skrue
 
 ----------------
 
@@ -24,19 +18,11 @@ Ensure temperature and log in /var/www/log does not grow too much
 
 Control commands via http
 
-PID relay
-
 Read target temperature from web server
 Log target temperature
-
-Real PID
-- Use interrupt
-- What about WiFi taking time?
-
-
 
 ================================================================
 HARDWARE
 ================================================================
 
-1-wire plug: find wrapper
+1-wire plug: find wrapper ... bare brug heatshrink

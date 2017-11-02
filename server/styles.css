@@ -1,0 +1,23 @@
+div.span {
+    box-sizing: border-box;
+    border: 10px solid white;
+    background-color: LawnGreen;
+    color: DarkGreen;
+    font-family: sans-serif;
+    font-size: 2000%;
+    float: left;
+    text-align: center;
+    padding: 10px;
+}
+
+@media screen and (max-width: 800px) , screen and (max-height: 800px) {
+    div.span {
+	font-size: 1000%;
+    }
+}
+
+@media screen and (max-width: 400px) , screen and (max-height: 400px) {
+    div.span {
+	font-size: 500%;
+    }
+}
