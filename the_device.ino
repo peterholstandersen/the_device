@@ -71,7 +71,7 @@ void log_message_serial_only(String msg);
 #include "error.h"    // Must be first
 #include "one_wire.h"
 #include "wifi.h"
-#include "relay.h"
+#include "relay_logic.h"
 
 void log_message(String msg)
 {
@@ -112,7 +112,7 @@ void setup()
   log_message(VERSION "\n");
 
   setup_one_wire();
-  setup_relay();
+  setup_logic();
 
   if (error == NO_ERROR)
     digitalWrite(GREEN_PIN, HIGH);
@@ -124,5 +124,5 @@ void loop()
   loop_error();
   loop_one_wire();
   loop_wifi();
-  loop_relay();
+  loop_logic();
 }

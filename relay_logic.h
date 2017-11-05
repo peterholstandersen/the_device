@@ -6,7 +6,7 @@ static long allowed_change_time = 5000;
 static long relay_keep_state = 10000;
 static long relay_next = -1;
 
-void setup_relay()
+void setup_logic()
 {
   if (error != NO_ERROR)
     return;
@@ -19,7 +19,7 @@ float get_actual_temperature() {
   return temperatures[0];
 }
 
-void loop_relay() {
+void loop_logic() {
   if (error != NO_ERROR)
     return;
   
