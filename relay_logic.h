@@ -14,11 +14,6 @@ void setup_logic()
   digitalWrite(RELAY_PIN, LOW);
 }
 
-float get_actual_temperature() {
-  // For now, we only have one probe
-  return temperatures[0];
-}
-
 void loop_logic() {
   if (error != NO_ERROR)
     return;

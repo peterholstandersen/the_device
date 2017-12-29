@@ -4,7 +4,7 @@
 #include <DallasTemperature.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266httpUpdate.h>
-
+#include <stdint.h>
 
 // ==== "Global" parameters and variables =====================================================
 
@@ -13,6 +13,9 @@
 #define GREEN_PIN               D4	// Power
 #define YELLOW_PIN              D3	// WiFi
 #define RED_PIN                 D5	// Heat / Error
+
+#define TRIAC_PIN               D1
+#define ZERO_CROSS_PIN          D2
 #define ONE_WIRE_PIN  		D6
 #define RELAY_PIN		D7
 
@@ -37,11 +40,9 @@ Error error = NO_ERROR;
 
 // ==== Temperature & PID settings  ===========================================================
 
-#define TARGET_TEMPERATURE      78.0f
+#define TARGET_TEMPERATURE      40.0f
 #define TEMPERATURE_TOLERANCE   0.5f
 #define TEMPERATURE_PRECISION   12
-// #define ZERO_CROSS_PIN
-// #define PID_PIN
 
 uint8_t deviceCount;
 float *temperatures;
@@ -52,10 +53,10 @@ String *deviceId;
 
 #define WIFI_RETRY_DELAY        (10*60*1000) 	// Interval between trying to reconnect to WiFi
 #define WIFI_INTERVAL		(10*1000)    	// Interval between uploading and checking for updates
-#define UPDATE_URL		"/esp/update.php"
+#define UPDATE_URL		"/cgi-bin/update.php"
 #define LOG_URL			"/cgi-bin/log_message.py"
 #define SSID			"CableBox-7A3D"
-#define HOST                    "192.168.0.10"	// X301. Fixed IP.
+#define HOST                    "192.168.0.17"	// ThinkCentre. Fixed IP.
 #define PORT			80
 
 const String log_temperature_url = "/cgi-bin/log_temperature.py";
@@ -71,7 +72,8 @@ void log_message_serial_only(String msg);
 #include "error.h"    // Must be first
 #include "one_wire.h"
 #include "wifi.h"
-#include "relay_logic.h"
+// #include "relay_logic.h"
+#include "pid_logic.h"
 
 void log_message(String msg)
 {
@@ -122,7 +124,7 @@ void setup()
 void loop()
 {
   loop_error();
-  loop_one_wire();
+  // loop_one_wire();
   loop_wifi();
   loop_logic();
 }

@@ -6,6 +6,17 @@ static OneWire oneWire(ONE_WIRE_PIN);
 static DallasTemperature sensors(&oneWire);
 static DeviceAddress *deviceAddress;
 
+float get_actual_temperature() {
+  float actual_temperature = 0.0;
+
+  // Just get the highest temperature
+  for (int i = 0; i < deviceCount; i++) {
+    if (temperatures[i] > actual_temperature)
+      actual_temperature = temperatures[i];
+  }
+  return actual_temperature;
+}
+
 void setup_one_wire() {
   if (error != NO_ERROR)
     return;

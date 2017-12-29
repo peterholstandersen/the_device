@@ -29,7 +29,7 @@ def printit(data):
 
     print '<head>'
     print '<link rel="stylesheet" type="text/css" media="screen" href="/styles.css">'
-    print '<meta http-equiv="refresh" content="1800">'
+    print '<meta http-equiv="refresh" content="1">'
     print '</head>'
 
     print '<body>'

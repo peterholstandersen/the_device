@@ -2,7 +2,7 @@ ARDUINO_HOME = /home/peter/arduino-1.8.1
 ESPTOOL      = $(ARDUINO_HOME)/hardware/esp8266com/esp8266/tools/esptool/esptool
 SKETCH       = $(notdir $(CURDIR)).ino
 TARGET_DIR   = $(CURDIR)/build
-INSTALL_DIR  = /var/www/html/esp/
+INSTALL_DIR  = /usr/lib/cgi-bin/
 MONITOR_PORT = /dev/ttyUSB0
 VERBOSE      = -verbose
 

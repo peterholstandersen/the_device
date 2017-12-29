@@ -28,21 +28,26 @@ void setup_wifi()
 // loop_wifi
 // ================================================================================
 void loop_wifi() {
-  if (error != NO_ERROR)
-    return;
+  // Always run this, even when there are errors. Otherwise update would be blocked.
 
-  update_wifi_led();
-  
   long now = millis();
   if (now < wifi_next)
     return;
   wifi_next = now + WIFI_INTERVAL;
 
+  update_wifi_led();
+
   if (!connect_wifi(false))
     return;
 
+  noInterrupts();
+
+  update_wifi_led();
+  
   log_temperature();
   check_update();
+
+  interrupts();
 }
 
 
@@ -96,7 +101,7 @@ bool connect_wifi(bool force) {
 // ================================================================================
 void check_update()
 {
-  log_message("Check update\n");
+  log_message("Check update: " UPDATE_URL "\n");
 
   t_httpUpdate_return ret = ESPhttpUpdate.update(HOST, PORT, UPDATE_URL, VERSION);
 

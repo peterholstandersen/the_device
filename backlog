@@ -1,18 +1,27 @@
-Vandkoger
-
-Log various useful information from relay.h
-
-Test with simple relay algorithm
-
-Relay PID
-
 Real PID
-- Use interrupt
-- What about WiFi taking time?
 
-Stram heatsink skrue
+Relay PID: when at 100
+
+RED led
+
+
+Test with 90% on
+
+Block interrupts, cleanup variables
+
+count turn_on, so that we can see how many cycles are skipped
+
+Use timer1 interrupts: http://onetechpulse.com/esp8266-microsecond-delay-timer/
+
+
+Check max triac load
+
+
+Integrate over the sinus curve to determine actual energy
+
 
 ----------------
+
 
 Ensure temperature and log in /var/www/log does not grow too much
 
