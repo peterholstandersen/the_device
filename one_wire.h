@@ -20,7 +20,7 @@ float get_actual_temperature() {
 void setup_one_wire() {
   if (error != NO_ERROR)
     return;
-  
+
   pinMode(ONE_WIRE_PIN, INPUT_PULLUP);
 
   sensors.begin();

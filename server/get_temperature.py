@@ -41,7 +41,7 @@ def printit(data):
 
     
 os.chdir("/var/www/log")
-for filename in glob.glob("temperature_0x*.log"):
+for filename in glob.glob("temperature_0x402557*.log"):
     name = os.path.splitext(os.path.basename(filename))[0]
     pair = (name, get_temperature(filename))
     data.append(pair)

@@ -42,9 +42,9 @@ Error error = NO_ERROR;
 
 #define ONE_WIRE_INTERVAL       1000
 
-#define TARGET_TEMPERATURE      40.0f
+#define TARGET_TEMPERATURE      84.0f
 #define TEMPERATURE_TOLERANCE   0.5f
-#define TEMPERATURE_PRECISION   9
+#define TEMPERATURE_PRECISION   12
 
 uint8_t deviceCount;
 float *temperatures;
@@ -54,7 +54,7 @@ String *deviceId;
 // ==== WiFi settings =========================================================================
 
 #define WIFI_RETRY_DELAY        (10*60*1000) 	// Interval between trying to reconnect to WiFi
-#define WIFI_INTERVAL		(60*1000)    	// Interval between uploading and checking for updates
+#define WIFI_INTERVAL		(10*1000)    	// Interval between uploading and checking for updates
 #define UPDATE_URL		"/cgi-bin/update.php"
 #define LOG_URL			"/cgi-bin/log_message.py"
 #define SSID			"CableBox-7A3D"
@@ -74,8 +74,8 @@ void log_message_serial(String msg);
 #include "error.h"    // Must be first
 #include "one_wire.h"
 #include "wifi.h"
-// #include "relay_logic.h"
-#include "pid_logic.h"
+#include "relay_logic.h"
+// #include "pid_logic.h"
 
 void log_message(String msg)
 {
@@ -90,7 +90,7 @@ void log_message(String msg)
 
 void log_message_serial(String msg)
 {
-  // Serial.print(msg);
+  Serial.print(msg);
 }
 
 
@@ -114,6 +114,7 @@ void setup()
 
   log_message("The Device 1.0\n");
   log_message(VERSION "\n");
+  log_message("Target temperature = " + String(TARGET_TEMPERATURE) + "\n");
 
   setup_one_wire();
   setup_logic();
