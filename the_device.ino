@@ -40,9 +40,11 @@ Error error = NO_ERROR;
 
 // ==== Temperature & PID settings  ===========================================================
 
+#define ONE_WIRE_INTERVAL       1000
+
 #define TARGET_TEMPERATURE      40.0f
 #define TEMPERATURE_TOLERANCE   0.5f
-#define TEMPERATURE_PRECISION   12
+#define TEMPERATURE_PRECISION   9
 
 uint8_t deviceCount;
 float *temperatures;
@@ -52,7 +54,7 @@ String *deviceId;
 // ==== WiFi settings =========================================================================
 
 #define WIFI_RETRY_DELAY        (10*60*1000) 	// Interval between trying to reconnect to WiFi
-#define WIFI_INTERVAL		(10*1000)    	// Interval between uploading and checking for updates
+#define WIFI_INTERVAL		(60*1000)    	// Interval between uploading and checking for updates
 #define UPDATE_URL		"/cgi-bin/update.php"
 #define LOG_URL			"/cgi-bin/log_message.py"
 #define SSID			"CableBox-7A3D"
@@ -67,7 +69,7 @@ const char *password = "farerdenbedste";
 // ==== Code ==================================================================================
 
 void log_message(String msg);
-void log_message_serial_only(String msg);
+void log_message_serial(String msg);
 
 #include "error.h"    // Must be first
 #include "one_wire.h"
@@ -77,7 +79,7 @@ void log_message_serial_only(String msg);
 
 void log_message(String msg)
 {
-  Serial.print(msg);
+  log_message_serial(msg);
   if (WiFi.status() == WL_CONNECTED) {
     msg.replace(' ', '+');
     msg.replace('\n', '+');
@@ -86,9 +88,9 @@ void log_message(String msg)
   }
 }
 
-void log_message_serial_only(String msg)
+void log_message_serial(String msg)
 {
-  Serial.print(msg);
+  // Serial.print(msg);
 }
 
 
@@ -104,8 +106,8 @@ void setup()
   digitalWrite(YELLOW_PIN, LOW);
   digitalWrite(RED_PIN, LOW);
   
-  log_message_serial_only("The Device 1.0 \n");
-  log_message_serial_only(VERSION "\n");
+  log_message_serial("The Device 1.0\n");
+  log_message_serial(VERSION "\n");
 
   setup_error();
   setup_wifi();
@@ -123,8 +125,8 @@ void setup()
 
 void loop()
 {
-  loop_error();
-  // loop_one_wire();
+  loop_error();      // Update LEDs upon error
+  loop_one_wire();
   loop_wifi();
   loop_logic();
 }

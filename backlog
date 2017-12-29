@@ -1,27 +1,37 @@
-Real PID
-
-Relay PID: when at 100
-
-RED led
 
 
-Test with 90% on
-
-Block interrupts, cleanup variables
-
-count turn_on, so that we can see how many cycles are skipped
-
-Use timer1 interrupts: http://onetechpulse.com/esp8266-microsecond-delay-timer/
 
 
-Check max triac load
 
-
-Integrate over the sinus curve to determine actual energy
-
+Detection of disconnected 1-wire => error
 
 ----------------
 
+OneWire: getTempC takes 12ms. Time is spent in OneWire communication (reset, read, etc.).
+However, it does not block interruptes for more than 480us, so it should be ok.
+However, light is blinking when reading temp, so something is going on.
+
+Disconnect WiFi: crashes => update library => issue with STL => Update toolchain => Install dev-env properly
+
+Driving inductive load (snubber)
+
+Test crashes
+
+Check interrupts
+
+Real PID + Relay
+
+----------------
+
+Avoid problems when logging temperature
+
+Block interrupts, cleanup variables
+
+Use timer1 interrupts: http://onetechpulse.com/esp8266-microsecond-delay-timer/
+
+Integrate over the sinus curve to determine actual energy
+
+----------------
 
 Ensure temperature and log in /var/www/log does not grow too much
 

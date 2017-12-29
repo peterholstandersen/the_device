@@ -1,18 +1,18 @@
 // -*- mode: c -*-
-// Milliseconds
 
-#define LOG_INTERVAL               2000
-#define CHECK_TEMPERATURE_INTERVAL  100
+#define LOG_INTERVAL                2000
+#define CHECK_TEMPERATURE_INTERVAL   500
 
 // At 50 Hz a period is 20ms, so a half period is 10 ms = 10000 us
 #define HALF_PERIOD_TIME_MICROS 10000
 
-uint32_t on_percentage = 50;
+// Variables shared between the interrupt routine and the main program must be declared volatile
+volatile uint32_t on_percentage = 50;
+volatile uint32_t zero_cross_count = 0;    // Number of zero crosses so far (wrapping is ok)
+volatile uint32_t next_turn_on = 0;	   // The time we want to turn on the triac on (microseconds)
 
 uint32_t next_log_time = 0;              // Time to log next time (millis)
-uint32_t zero_cross_count = 0;           // Number of zero crosses so far (wrapping is ok)
 uint32_t turn_on_mark = 0;               // The zero-cross count when we turned the triac on
-uint32_t next_turn_on = 0;		 // The time we want to turn on the triac on (microseconds)
 
 uint32_t previous_log_time = 0;
 
@@ -35,8 +35,11 @@ void setup_logic() {
 }
 
 void loop_triac() {
+  noInterrupts();
+
   if (turn_on_mark == zero_cross_count) {
     // We have already turned it on this half-phase
+    interrupts();
     return;
   }
 
@@ -50,6 +53,8 @@ void loop_triac() {
     // Avoid turning it on again (no need to and may potentially give problems?)
     turn_on_mark = zero_cross_count;
   }
+
+  interrupts();
 }
 
 void loop_check_temperature() {

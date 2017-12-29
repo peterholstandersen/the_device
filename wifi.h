@@ -16,7 +16,7 @@ void setup_wifi()
   if (error != NO_ERROR)
     return;
   
-  log_message_serial_only("Connecting to " SSID "\n");
+  log_message_serial("Connecting to " SSID "\n");
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, password);
@@ -40,14 +40,10 @@ void loop_wifi() {
   if (!connect_wifi(false))
     return;
 
-  noInterrupts();
-
-  update_wifi_led();
-  
   log_temperature();
   check_update();
 
-  interrupts();
+  update_wifi_led();
 }
 
 
@@ -69,7 +65,7 @@ bool connect_wifi(bool force) {
 
   // Not connected: check if it is time try again
   if (!force && millis() < next_wifi_retry) {
-    log_message_serial_only("Not time to reconnect yet\n");
+    log_message_serial("Not time to reconnect yet\n");
     return false;
   }
 
@@ -79,18 +75,18 @@ bool connect_wifi(bool force) {
     led_on = !led_on;
     digitalWrite(YELLOW_PIN, led_on ?HIGH :LOW);
     delay(500);
-    log_message_serial_only(".");
+    log_message_serial(".");
   }
-  log_message_serial_only("\n");
+  log_message_serial("\n");
 
   update_wifi_led();
   
   if (WiFi.status() == WL_CONNECTED) {
-    log_message("WiFi connected.\n");
+    log_message_serial("WiFi connected.\n");
     return true;
   }
   else {
-    log_message_serial_only("Unable to connect to WiFi\n");
+    log_message_serial("Unable to connect to WiFi\n");
     next_wifi_retry = millis() + WIFI_RETRY_DELAY;
     return false;
   }
@@ -120,16 +116,16 @@ void check_update()
 
 bool do_request(String url)
 {
-  log_message_serial_only("Connecting to " HOST "\n");
+  log_message_serial("Connecting to " HOST "\n");
 
   WiFiClient client;
 
   if (!client.connect(HOST, PORT)) {
-    log_message_serial_only("Connection failed");
+    log_message_serial("Connection failed");
     return false;
   }
   
-  log_message_serial_only("Requesting URL: " + String(url) + "\n");
+  log_message_serial("Requesting URL: " + String(url) + "\n");
   
   client.print(String("GET ") + url + " HTTP/1.1\r\n"
 	       "Host: " HOST "\r\n"
@@ -138,14 +134,14 @@ bool do_request(String url)
   unsigned long timeout = millis();
   while (client.available() == 0) {
     if (millis() - timeout > 5000) {
-      log_message_serial_only("HTTP request timeout\n");
+      log_message_serial("HTTP request timeout\n");
       // TODO: cleanup
       client.stop();
       return false;
     }
   }
 
-  log_message_serial_only("Closing connection\n");
+  log_message_serial("Closing connection\n");
   client.stop();
 
   return true;

@@ -42,11 +42,11 @@ void loop_logic() {
 
   if (desired_state == LOW) {
     analogWrite(RED_PIN, RED_0);
-    log_message("Relay off\n");
+    log_message_serial("Relay off\n");
   }
   else {
     analogWrite(RED_PIN, RED_100);
-    log_message("Relay on\n");
+    log_message_serial("Relay on\n");
   }
 
   digitalWrite(RELAY_PIN, desired_state);
